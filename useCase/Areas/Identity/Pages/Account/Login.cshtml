@@ -1,0 +1,91 @@
+﻿@page
+@model LoginModel
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<Utilisateur> SignInManager
+@inject UserManager<Utilisateur> UserManager
+
+@{
+    var userId = HttpContext.Session.GetString("UserId");
+    if (userId != null)
+    {
+        Response.Redirect("/Reclamation/CreateReclamation");
+        return;
+    }
+    Layout = null;
+    string controller = "Home";
+    string action = "Index";
+    string controller2 = "Interet";
+    string action2 = "AddInteret";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" hr ef="~/useCase.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/styles.css" asp-append-version="true" />
+</head>
+<body>
+
+    
+
+    <div class="flex items-center justify-center min-h-screen bg-gray-100">
+        <div class="relative flex flex-col    wspace-y-4 bg-white shadow-2xl rounded-2xl md:flex-row md:space-y-0">
+            <!-- left side -->
+            <div class="flex flex-col justify-center  md:p-14">
+                <span class="text-black  text-4xl font-bold">Welcome back</span>
+                <span class="font-light text-gray-400 ">
+                    Welcom back! Please enter your details
+                </span>
+                <form id="account" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+                <div class="py-4">
+                        <label asp-for="Input.Email" class="mb-2 text-md">Email</label>
+                        <input class="w-full p-2 border border-gray-300 rounded-md placeholder:font-light placeholder:text-gray-500" asp-for="Input.Email" autocomplete="username" aria-required="true" />
+                        <span asp-validation-for="Input.Email" class="text-danger"></span>
+                </div>
+                <div class="py-4">
+                        <label asp-for="Input.Password" class="mb-2 text-md">Password</label>
+                        <input asp-for="Input.Password" class="w-full p-2 border border-gray-300 rounded-md placeholder:font-light placeholder:text-gray-500" autocomplete="current-password" aria-required="true" />         
+                        <span asp-validation-for="Input.Password" class="text-danger"></span>
+                </div>
+                <div class="flex justify-between w-full py-4">
+                    <div class="mr-24">
+                            <label>
+                                <input type="checkbox" asp-for="Input.RememberMe" class="mr-2" />
+                                <span class="text-md">Remember for 30 days</span>
+                            </label>
+                    </div>
+                    <span class="font-bold text-black">Forgot password</span>
+                </div>
+                
+                    <button id="login-submit" type="submit" class="w-full bg-black text-white p-2 rounded-lg mb-6 hover:bg-white hover:text-black hover:border hover:border-gray-300">Sign In</button>
+                </form>
+               
+                <div class="text-center text-gray-400">
+                    Dont'have an account?
+                    
+                    <a class="font-bold text-black" asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Sign up for free</a>
+                </div>
+                
+            </div>
+            <!-- {/* right side */} -->
+            <div class="relative ">
+                <img src="/images/Tanger.jpg"
+                     alt="img"
+                     class="w-[400px] h-[580px] hidden rounded-r-2xl md:block object-cover" />
+
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

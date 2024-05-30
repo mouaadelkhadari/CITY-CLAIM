@@ -1,0 +1,161 @@
+﻿@using Microsoft.AspNetCore.Identity
+@inject UserManager<Utilisateur> UserManager
+@inject SignInManager<Utilisateur> SignInManager
+@using useCase.Areas.Identity.Data
+@using useCase.Controllers
+@model List<Reclamation>
+@{
+    var userManager = Context.RequestServices.GetService(typeof(UserManager<Utilisateur>)) as UserManager<Utilisateur>;
+    var user = await userManager.GetUserAsync(User);
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Reclamations</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" hr ef="~/useCase.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/styles.css" asp-append-version="true" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body>
+
+    <span class="absolute text-white text-4xl top-5 left-4 cursor-pointer" onclick="Openbar()">
+        <i class="bi bi-filter-left px-2 bg-gray-900 rounded-md"></i>
+    </span>
+    <div class="sidebar fixed top-0 bottom-0 lg:left-0 left-[-300px] duration-1000 p-2 w-[300px] overflow-y-auto text-center bg-gray-900 shadow h-screen">
+        <img src="/images//TNG.png" alt="Logo" class="mx-auto my-0" style="width: 200px;">
+        <div class="text-gray-100 text-xl">
+
+            <hr class="my-2 text-gray-600">
+            <div>
+
+                @if (user != null && (user.Role == "Admin" || user.Role == "User"))
+                {
+                    <div class="p-2.5 mt-2 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-blue-600">
+                        <a href="/Reclamation/CreateReclamation">
+                            <i class="bi bi-house-door-fill"></i>
+                            <span class="text-[15px] ml-4 text-gray-200"><i class="fa-solid fa-plus"></i> Add Reclamation</span>
+                        </a>
+                    </div>
+                }
+
+                @if (user != null && (user.Role == "Admin" || user.Role == "User"))
+                {
+                    <div class="p-2.5 mt-2 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-blue-600">
+                        <a href="/Reclamation/ReclamationsParNomEtPrenom">
+                            <i class="bi bi-house-door-fill"></i>
+                            <span class="text-[15px] ml-4 text-gray-200"><i class="fa-regular fa-eye"></i> View Reclamation</span>
+                        </a>
+                    </div>
+                }
+
+                @if (user != null && user.Role == "Admin")
+                {
+                    <div class="p-2.5 mt-2 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-blue-600">
+                        <a href="/Identity/Account/AddEmployee">
+                            <i class="bi bi-house-door-fill"></i>
+                            <span class="text-[15px] ml-4 text-gray-200"><i class="fa-regular fa-user"></i> Add Employee</span>
+                        </a>
+                    </div>
+                }
+
+                @if (user != null && user.Role == "Admin")
+                {
+                    <div class="p-2.5 mt-2 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-blue-600">
+                        <a asp-controller="Interet" asp-action="AddInteret">
+                            <i class="bi bi-bookmark-fill"></i>
+                            <span class="text-[15px] ml-4 text-gray-200"><i class="fa-regular fa-building"></i> Add Interest</span>
+                        </a>
+                    </div>
+                }
+
+                @if (user != null && (user.Role == "Admin" || user.Role == "Employee"))
+                {
+                    <div class="p-2.5 mt-2 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-blue-600">
+                        <a href="/Reclamation/DisplayReclamations">
+                            <i class="bi bi-house-door-fill"></i>
+                            <span class="text-[15px] ml-4 text-gray-200"><i class="fa-solid fa-eye"></i> Display Reclamations</span>
+                        </a>
+                    </div>
+                }
+                @if (SignInManager.IsSignedIn(User))
+                {
+                    <form asp-controller="Account" asp-action="Logout" method="post" id="logoutForm" class="p-2.5 mt-2 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-blue-600">
+                        <button type="submit" class="flex items-center text-gray-200">
+                            <i class="bi bi-box-arrow-left mr-2"></i>
+                            <span class="text-[15px]">&nbsp;&nbsp;<i class="fa-solid fa-right-from-bracket"></i> Log Out</span>
+                        </button>
+                    </form>
+                }
+            </div>
+
+        </div>
+    </div>
+    <div class="flex ml-[300px] items-center justify-center min-h-screen bg-gray-100">
+        <div class="relative flex flex-col m-6 space-y-8 bg-white shadow-2xl rounded-2xl md:flex-row md:space-y-0">
+            <div class="flex flex-col justify-center p-8 md:p-14">
+                <span class="mb-1 text-4xl font-bold">Hello @ViewBag.NomUtilisateur @ViewBag.PrenomUtilisateur!</span>
+                <span class="font-light text-gray-400 mb-8">Discover All Your Reclamations</span>
+                <div class="mt-4 overflow-hidden">
+                    <table class="font-inter w-full table-auto border-separate border-spacing-y-1 overflow-scroll text-left md:overflow-auto">
+                        <!-- Le reste de votre code de tableau ici -->
+                        <thead class="w-full rounded-lg bg-[#222E3A]/[6%] text-base font-semibold text-white">
+                            <tr class="">
+                                <th class="whitespace-nowrap rounded-l-lg py-3 pl-3 pr-6 text-sm font-normal text-[#212B36]">#</th>
+                                <th class="whitespace-nowrap py-3 pl-6 pr-6 text-sm font-normal text-[#212B36]">CreationDate</th>
+                                <th class="whitespace-nowrap py-3 pl-6 pr-6 text-sm font-normal text-[#212B36]">Interest</th>
+                                <th class="whitespace-nowrap px-6 py-3 text-sm font-normal text-[#212B36]">Description</th>
+                                <th class="whitespace-nowrap py-3 text-sm font-normal text-[#212B36]">Address</th>
+                                <th class="whitespace-nowrap py-3 text-sm font-normal text-[#212B36]">State</th>
+                                <th class="whitespace-nowrap py-3 text-sm font-normal text-[#212B36]">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var reclamation in Model)
+                            {
+                                <tr class="cursor-pointer bg-[#f6f8fa] drop-shadow-[0_0_10px_rgba(34,46,58,0.02)] hover:shadow-2xl">
+                                    <td class="rounded-l-lg py-4 pl-3 text-sm font-normal text-[#637381]">@reclamation.Id</td>
+                                    <td class="px-6 py-4 text-sm font-normal text-[#637381]">@reclamation.DateCreation.ToShortDateString()</td>
+                                    <td class="px-6 py-4 text-sm font-normal text-[#637381]">@reclamation.InteretName</td>
+                                    <td class="px-6 py-4 text-sm font-normal text-[#637381]">@reclamation.Description</td>
+                                    <td class="px-1 py-4 text-sm font-normal text-[#637381]">@reclamation.Address</td>
+                                    <td class="px-1 py-4 text-sm font-normal text-[#637381]">@reclamation.status</td>
+                                    <td class="px-1 py-4 text-sm font-normal text-[#637381]">
+                                        <div class="flex">
+                                            <form asp-action="ModifierReclamation" method="get">
+                                                <input type="hidden" name="idReclamation" value="@reclamation.Id" />
+                                                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full mr-2">
+                                                    Modify
+                                                </button>
+                                            </form>
+
+                                            <form asp-action="Delete" asp-controller="Reclamation" method="post">
+                                                <input type="hidden" name="id" value="@reclamation.Id" />
+                                                <button type="submit" class="bg-red-700 hover:bg-red-900 text-white font-bold py-2 px-4 rounded-full mr-2">Delete</button>
+                                            </form>
+                                        </div>
+                                    </td>
+
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</body>
+</html>
+
+
+
+

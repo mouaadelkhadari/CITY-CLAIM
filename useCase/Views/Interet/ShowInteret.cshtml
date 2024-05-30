@@ -1,0 +1,50 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using useCase.Areas.Identity.Data
+@model List<Interet>
+@{
+    ViewData["Title"] = "Liste des Intérêts";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste des Intérêts</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" hr ef="~/useCase.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/styles.css" asp-append-version="true" />
+</head>
+<body>
+
+<!-- Votre contenu HTML pour l'affichage des intérêts ici -->
+
+<h1>Liste des Intérêts</h1>
+
+<table class="table">
+    <thead>
+    <tr>
+        <th>Id</th>
+        <th>Nom</th>
+        <th>Localisation</th>
+        <th>Responsable</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var interet in Model)
+    {
+        <tr>
+            <td>@interet.Id</td>
+            <td>@interet.Name</td>
+            <td>@interet.Localisation</td>
+            <td>@interet.Responsable.FirstName @interet.Responsable.LastName</td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+</body>
+</html>

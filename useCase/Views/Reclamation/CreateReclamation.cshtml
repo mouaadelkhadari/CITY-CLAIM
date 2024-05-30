@@ -1,0 +1,257 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using useCase.Areas.Identity.Data
+@model useCase.Areas.Identity.Data.Reclamation
+@inject UserManager<Utilisateur> UserManager
+@inject SignInManager<Utilisateur> SignInManager
+@inject UserManager<Utilisateur> UserManager
+
+@{
+    var userManager = Context.RequestServices.GetService(typeof(UserManager<Utilisateur>)) as UserManager<Utilisateur>;
+    var user = await userManager.GetUserAsync(User);
+    Layout = null;
+    string controller = "Home";
+    string action = "Index";
+    string controller2 = "Interet";
+    string action2 = "AddInteret";
+    var currentUser = await UserManager.GetUserAsync(User);
+    var successMessage = TempData["SuccessMessage"] as string;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Reclamation</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" hr ef="~/useCase.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+</head>
+<body>
+
+    <span class="absolute text-white text-4xl top-5 left-4 cursor-pointer" onclick="Openbar()">
+        <i class="bi bi-filter-left px-2 bg-gray-900 rounded-md"></i>
+    </span>
+    <div class="sidebar fixed top-0 bottom-0 lg:left-0 left-[-300px] duration-1000 p-2 w-[300px] overflow-y-auto text-center bg-gray-900 shadow h-screen">
+        <img src="/images//TNG.png" alt="Logo" class="mx-auto my-0" style="width: 200px;">
+        <div class="text-gray-100 text-xl">
+
+            <hr class="my-2 text-gray-600">
+            <div>
+
+                @if (user != null && (user.Role == "Admin" || user.Role == "User"))
+                {
+                    <div class="p-2.5 mt-2 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-blue-600">
+                        <a href="/Reclamation/CreateReclamation">
+                            <i class="bi bi-house-door-fill"></i>
+                            <span class="text-[15px] ml-4 text-gray-200"><i class="fa-solid fa-plus"></i> Add Reclamation</span>
+                        </a>
+                    </div>
+                }
+
+                @if (user != null && (user.Role == "Admin" || user.Role == "User")){
+                <div class="p-2.5 mt-2 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-blue-600">
+                    <a href="/Reclamation/ReclamationsParNomEtPrenom">
+                        <i class="bi bi-house-door-fill"></i>
+                            <span class="text-[15px] ml-4 text-gray-200"><i class="fa-regular fa-eye"></i> View Reclamation</span>
+                    </a>
+                </div>
+                }
+
+                @if (user != null && user.Role == "Admin")
+                {
+                    <div class="p-2.5 mt-2 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-blue-600">
+                        <a href="/Identity/Account/AddEmployee">
+                            <i class="bi bi-house-door-fill"></i>
+                            <span class="text-[15px] ml-4 text-gray-200"><i class="fa-regular fa-user"></i> Add Employee</span>
+                        </a>
+                    </div>
+                }
+
+                @if (user != null && user.Role == "Admin")
+                {
+                    <div class="p-2.5 mt-2 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-blue-600">
+                        <a asp-controller="Interet" asp-action="AddInteret">
+                            <i class="bi bi-bookmark-fill"></i>
+                            <span class="text-[15px] ml-4 text-gray-200"><i class="fa-regular fa-building"></i> Add Interest</span>
+                        </a>
+                    </div>
+                }
+
+                @if (user != null && (user.Role == "Admin" || user.Role == "Employee"))
+                {
+                    <div class="p-2.5 mt-2 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-blue-600">
+                        <a href="/Reclamation/DisplayReclamations">
+                            <i class="bi bi-house-door-fill"></i>
+                            <span class="text-[15px] ml-4 text-gray-200"><i class="fa-solid fa-eye"></i> Display Reclamations</span>
+                        </a>
+                    </div>
+                }
+                @if (SignInManager.IsSignedIn(User))
+                {
+                    <form asp-controller="Account" asp-action="Logout" method="post" id="logoutForm" class="p-2.5 mt-2 flex items-center rounded-md px-4 duration-300 cursor-pointer hover:bg-blue-600">
+                        <button type="submit" class="flex items-center text-gray-200">
+                            <i class="bi bi-box-arrow-left mr-2"></i>
+                            <span class="text-[15px]">&nbsp;&nbsp;<i class="fa-solid fa-right-from-bracket"></i> Log Out</span>
+                        </button>
+                    </form>
+                }
+            </div>
+
+        </div>
+    </div>
+
+    <div class="flex ml-[300px] items-center justify-center min-h-screen bg-gray-100">
+        <div class="relative flex flex-col m-6 space-y-8 bg-white shadow-2xl rounded-2xl md:flex-row md:space-y-0">
+            <div class="flex flex-col justify-center p-8 md:p-14">
+
+                @if (TempData["successMessage"] != null)
+                {
+                    <div id="alertContainer" class="alert alert-success alert-dismissible fade show position-fixed top-3 start-50 translate-middle-x" role="alert" style="width: 300px;">
+                        @TempData["successMessage"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    <script>
+                        setTimeout(function () {
+                            document.getElementById('alertContainer').remove();
+                        }, 3000); // Ferme l'alerte après 5 secondes (5000 ms)
+                    </script>
+                }
+
+                <span class="mb-3 text-4xl font-bold">Submit a New Claim</span>
+                <span class="font-light text-gray-400 mb-8">Provide Details and Location</span>
+                <form method="post" asp-controller="Reclamation" asp-action="AddReclamation">
+                    <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+
+                    @if (currentUser != null)
+                    {
+                        <div class="flex py-2">
+                            <div class="w-full pr-2">
+                                <label class="mb-2 text-md">Reclamation First Name&nbsp;&nbsp;&nbsp;</label>
+                                <input class="w-full  p-2 border border-gray-300 rounded-md placeholder-gray-400 text-gray-600 bg-gray-200" value="@currentUser.FirstName" disabled />
+                            </div>
+
+                            <div class="w-full pl-2">
+                                <label class="mb-2 text-md">Reclamation Last Name&nbsp;&nbsp;&nbsp;</label>
+                                <input class="w-full p-2 border border-gray-300 rounded-md placeholder-gray-400 text-gray-600 bg-gray-200" value="@currentUser.LastName" disabled />
+                            </div>
+                        </div>
+                    }
+
+                    <div class="flex">
+                        <div class="w-full pr-2">
+                            <div class="form-group">
+                                <label asp-for="InteretName" class="block mb-1">Reclamation Interest</label>
+                                <select asp-for="InteretName" class="form-control w-full" id="InteretName" name="InteretName" required>
+                                    <option value="">-- Select Interest --</option>
+                                    @foreach (var interet in ViewBag.Interets)
+                                    {
+                                        <option value="@interet.Text">@interet.Text</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="w-full pl-2">
+                            <div class="py-2">
+                                <label asp-for="Description" class="block mb-1 text-md">Reclamation Description</label>
+                                <textarea class="w-full p-2 border border-gray-300 rounded-md placeholder:font-light placeholder:text-gray-500" rows="4" asp-for="Description"></textarea>
+                                <span asp-validation-for="Description" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="flex">
+                        
+                        <div class="w-full pr-2">
+                            <span class="font-light text-gray-400 mb-8">Please Choose the Address for Your Reclamation</span>
+                            <div id="map" style="height: 300px;" class="order border-gray-300 rounded-md mb-4"></div>
+                        </div>
+                        <div class="w-full pl-2">
+                            <div py-2>
+                                <label asp-for="Address" class="block mb-2 text-md">Reclamation Address</label>
+                                <textarea asp-for="Address" id="addressInput" class="w-full p-2 border border-gray-300 rounded-md placeholder:font-light placeholder:text-gray-500" rows="4"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                    <script>
+                        var map = L.map('map').setView([35.7596, -5.8330], 13);
+
+                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                        }).addTo(map);
+
+                        var marker;
+
+                        var geocoder = L.Control.Geocoder.nominatim();
+
+                        map.on('click', function (e) {
+                            geocoder.reverse(e.latlng, map.options.crs.scale(map.getZoom()), function (results) {
+                                var r = results[0];
+                                if (r) {
+                                    document.getElementById('addressInput').value = r.name;
+
+                                    // Supprimer le marqueur existant s'il y en a un
+                                    if (marker) {
+                                        map.removeLayer(marker);
+                                    }
+
+                                    // Créer un nouveau marqueur aux coordonnées du clic et l'ajouter à la carte
+                                    marker = L.marker(e.latlng).addTo(map);
+
+                                    // Centrer la carte sur le marqueur
+                                    map.panTo(e.latlng);
+                                }
+                            });
+                        });
+                    </script>
+
+                    <div class="mt-8">
+                        <button type="submit" class="w-full bg-black text-white p-2 rounded-lg mb-6 hover:bg-white hover:text-black hover:border hover:border-gray-300">Submit</button>
+                    </div>
+
+
+
+                    <script>
+                        document.addEventListener("DOMContentLoaded", function () {
+                            var form = document.querySelector("form");
+                            form.addEventListener("submit", function () {
+                                form.reset();
+                            });
+                        });
+                    </script>
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function dropDown() {
+            document.querySelector('#submenu').classList.toggle('hidden')
+            document.querySelector('#arrow').classList.toggle('rotate-0')
+        }
+        dropDown()
+
+        function Openbar() {
+            document.querySelector('.sidebar').classList.toggle('left-[-300px]')
+        }
+    </script>
+
+</body>
+</html>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

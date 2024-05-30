@@ -1,0 +1,140 @@
+﻿@page
+@model RegisterModel
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<Utilisateur> SignInManager
+@inject UserManager<Utilisateur> UserManager
+
+@{
+    var userId = HttpContext.Session.GetString("UserId");
+    if (userId != null)
+    {
+        Response.Redirect("/Reclamation/CreateReclamation");
+        return;
+    }
+    Layout = null;
+    string controller = "Home";
+    string action = "Index";
+    string controller2 = "Interet";
+    string action2 = "AddInteret";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" hr ef="~/useCase.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/styles.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="flex items-center justify-center min-h-screen bg-gray-100">
+        <div class="relative flex flex-col m-6 space-y-8 bg-white shadow-2xl rounded-2xl md:flex-row md:space-y-0">
+            <!-- left side -->
+            <div class="flex flex-col justify-center p-8 md:p-14">
+                @if (TempData["SignUpSuccessMessage"] != null)
+                {
+                    <div id="alertContainer" class="alert alert-success alert-dismissible fade show position-fixed top-3 start-50 translate-middle-x" role="alert" style="width: 300px;">
+                        @TempData["SignUpSuccessMessage"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    <script>
+                        setTimeout(function () {
+                            document.getElementById('alertContainer').remove();
+                        }, 3000); // Ferme l'alerte après 5 secondes (5000 ms)
+                    </script>
+                }
+
+                <span class="text-black mb-3 text-4xl font-bold">Registration Form</span>
+                <span class="font-light text-gray-400 mb-8">
+                    Fill out the form carefully for registration
+                </span>
+                <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+                    <div class="flex py-2">
+                        <div class="w-1/2 pr-2">
+                            <label asp-for="Input.FirstName" class="mb-2 text-md">First Name</label>
+                            <input class="w-full p-2 border border-gray-300 rounded-md placeholder:font-light placeholder:text-gray-500" asp-for="Input.FirstName" autocomplete="firstname" aria-required="true" />
+                            <span asp-validation-for="Input.FirstName" class="text-danger"></span>
+                        </div>
+                        <div class="w-1/2 pl-2">
+                            <label asp-for="Input.LastName" class="mb-2 text-md">Last Name</label>
+                            <input class="w-full p-2 border border-gray-300 rounded-md placeholder:font-light placeholder:text-gray-500" asp-for="Input.LastName" autocomplete="lastname" aria-required="true" />
+                            <span asp-validation-for="Input.LastName" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="py-2">
+                        <label asp-for="Input.Email" class="mb-2 text-md">Email</label>
+                        <input class="w-full p-2 border border-gray-300 rounded-md placeholder:font-light placeholder:text-gray-500" asp-for="Input.Email" autocomplete="username" aria-required="true" />
+                        <span asp-validation-for="Input.Email" class="text-danger"></span>
+                    </div>
+
+                    <div class="py-2">
+                        <label asp-for="Input.MobilePhone" class="mb-2 text-md">Mobile Phone</label>
+                        <input class="w-full p-2 border border-gray-300 rounded-md placeholder:font-light placeholder:text-gray-500" asp-for="Input.MobilePhone" autocomplete="mobilephone" aria-required="true" />
+                        <span asp-validation-for="Input.MobilePhone" class="text-danger"></span>
+                    </div>
+
+                    <div class="py-2">
+                        <label asp-for="Input.Gender" class="mb-2 text-md">Gender</label>
+                        <select asp-for="Input.Gender" class="w-full p-2 border border-gray-300 rounded-md">
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                        </select>
+                        <span asp-validation-for="Input.Gender" class="text-danger"></span>
+                    </div>
+
+
+                    <div class="flex py-2">
+                        <div class="w-1/2 pr-2">
+                            <label asp-for="Input.Password" class="mb-2 text-md">Password</label>
+                            <input asp-for="Input.Password" class="w-full p-2 border border-gray-300 rounded-md placeholder:font-light placeholder:text-gray-500" autocomplete="new-password" aria-required="true" />
+                            <span asp-validation-for="Input.Password" class="text-danger"></span>
+                        </div>
+                        <div class="w-1/2 pl-2">
+                            <label asp-for="Input.ConfirmPassword" class="mb-2 text-md">Confirm Password</label>
+                            <input asp-for="Input.ConfirmPassword" class="w-full p-2 border border-gray-300 rounded-md placeholder:font-light placeholder:text-gray-500" autocomplete="new-password" aria-required="true" />
+                            <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+                        </div>
+                    </div>
+
+
+                    <div class="flex justify-between w-full py-2">
+                        <div class="mr-24">
+                        </div>
+
+                    </div>
+                    
+                    <button id="registerSubmit" type="submit" class="w-full bg-black text-white p-2 rounded-lg mb-6 hover:bg-white hover:text-black hover:border hover:border-gray-300">Sign Up</button>
+
+                </form>
+
+                
+                <div class="text-center text-gray-400">
+                    Already have an account?
+                    <a class="font-bold text-black" href="/Identity/Account/Login">Access your account</a>
+                </div>
+
+            </div>
+            <!-- {/* right side */} -->
+            <div class="relative">
+                <img src="/images/Tanger.jpg"
+                     alt="img"
+                     class="w-[400px] h-full hidden rounded-r-2xl md:block object-cover" />
+
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
+
+
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
